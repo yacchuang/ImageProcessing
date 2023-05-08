@@ -23,7 +23,7 @@ image_dataset = pd.DataFrame()
 # read all images in the folder
 image_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSeg/image/"
 for image in os.listdir(image_path):
-    # print(image)
+    print(image)
     df1 = pd.DataFrame()
     img = cv2.imread(image_path + image)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -32,7 +32,7 @@ for image in os.listdir(image_path):
     
 ###############################################################################
 ## Add data to the dataframe
-    df1['Image name'] = str(image)
+    # df1['Image name'] = str(image)
     df1['Pixel Value'] = img2
     
 ###############################################################################
@@ -126,7 +126,7 @@ for mask in os.listdir(mask_path):
     msk = cv2.cvtColor(msk, cv2.COLOR_BGR2GRAY)
     msk2 = msk.reshape(-1)
     
-    df2['Label name'] = str(mask)
+    # df2['Label name'] = str(mask)
     df2['Label Value'] = msk2
     
     mask_dataset = mask_dataset.append(df2)
@@ -134,33 +134,63 @@ for mask in os.listdir(mask_path):
 ###############################################################################
 ## Combine image and mask dataframe, and ready to train RF or SVM
 ###############################################################################
+
 dataset = pd.concat([image_dataset, mask_dataset], axis = 1) # axis = 1 meaning concatnate along column
 
 # Split X and Y dataset, and split training and testing dataset
 from sklearn.model_selection import train_test_split
 
 Y = dataset['Label Value'].values
-X = dataset.drop(labels = ['label'], axis =1)
-X = dataset.dropna()
+X = dataset.drop(labels = ['Label Value'], axis =1)
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=20)
+
+
 ###############################################################################
 ## Define a classifier and fit a model with training dataset
 ###############################################################################
-from sklearn import svm
 
-SVMmodel = svm.SVC(max_iter=100)
+from sklearn.svm import LinearSVC
+
+SVMmodel = LinearSVC(max_iter=500)
+SVMmodel.fit(X_train, y_train)
+
+y_pred = SVMmodel.predict(X_test)
+# y_proba = SVMmodel.predict_proba(X_test)
+
+
+from sklearn.ensemble import RandomForestClassifier
+
+RFmodel = RandomForestClassifier(n_estimators=10, random_state=30)
+RFmodel.fit(X_train, y_train)
+
+RF_pred_train = RFmodel.predict(X_train)
+RF_y_pred = RFmodel.predict(X_test)
+
 
 ###############################################################################
 ## Accuracy check
 ###############################################################################
-from sklearn import metrics
 
+from sklearn import metrics
+print("Accuracy = ", metrics.accuracy_score(y_test, RF_y_pred))
 
 
 ###############################################################################
 ## Save the model for future use
 ###############################################################################
+
 import pickle
 
+filename = "SomaSeg"
+pickle.dump(SVMmodel, open(filename, 'wb'))
+
+Load_model = pickle.load(open(filename, 'rb'))
+result = Load_model.predict(X)
+
+Segment = result.reshape(img.shape)
+
+plt.imshow(Segment)
+plt.imsave('NeunSeg1.jpg', Segment, cmap='jet')
 
