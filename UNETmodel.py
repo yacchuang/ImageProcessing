@@ -43,3 +43,32 @@ c5 = tf.keras.layers.Conv2D(256, (3,3), activation= 'relu', kernel_initializer='
 
 
 #Expansive path 
+U6 = tf.keras.layers.Conv2DTranspose(128, (2,2), strides=(2, 2), padding='same')(c5)
+U6 = tf.keras.layers.concatenate([U6, c4])
+c6 = tf.keras.layers.Conv2D(128, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(U6)
+c6 = tf.keras.layers.Dropout(0.2)(c6) # dropout
+c6 = tf.keras.layers.Conv2D(128, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(c6)
+
+U7 = tf.keras.layers.Conv2DTranspose(64, (2,2), strides=(2, 2), padding='same')(c6)
+U7 = tf.keras.layers.concatenate([U7, c3])
+c7 = tf.keras.layers.Conv2D(64, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(U7)
+c7 = tf.keras.layers.Dropout(0.2)(c7) # dropout
+c7 = tf.keras.layers.Conv2D(64, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(c7)
+
+U8 = tf.keras.layers.Conv2DTranspose(32, (2,2), strides=(2, 2), padding='same')(c7)
+U8 = tf.keras.layers.concatenate([U8, c2])
+c8 = tf.keras.layers.Conv2D(32, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(U8)
+c8 = tf.keras.layers.Dropout(0.1)(c8) # dropout
+c8 = tf.keras.layers.Conv2D(32, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(c8)
+
+U9 = tf.keras.layers.Conv2DTranspose(16, (2,2), strides=(2, 2), padding='same')(c8)
+U9 = tf.keras.layers.concatenate([U9, c1], axis=3)
+c9 = tf.keras.layers.Conv2D(16, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(U9)
+c9 = tf.keras.layers.Dropout(0.1)(c9) # dropout
+c9 = tf.keras.layers.Conv2D(16, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(c9)
+
+outputs = tf.keras.layers.Conv2D(1, (1,1), activation="sigmoid")(c9)
+
+model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.summary()
