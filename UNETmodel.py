@@ -6,17 +6,65 @@ Created on Tue May  9 14:29:38 2023
 """
 
 import tensorflow as tf
+import os
+import numpy as np
+import random
 
-IMAGE_WIDTH = 128
-IMAGE_HEIGHT = 128
+from tqdm import tqdm      # shows the progress within for loop
+
+from skimage.io import imread, imshow
+from skimage.transform import resize
+from matplotlib import pyplot as plt
+
+
+# define a seed = np.random.seed to make share every run keeps the same number
+seed = 42
+np.random.seed = seed
+
+# Define training and testing path
+IMAGE_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/image/"
+MASK_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/masks/"
+
+# read all images IDs use os.walk
+# TRAIN_ID = next(os.walk(TRAIN_PATH))[1]
+# TEST_ID = next(os.walk(TEST_PATH))[1]
+
+IMAGE_WIDTH = 1280
+IMAGE_HEIGHT = 1280
 IMG_CHANNEL = 3
 
+# Create an empty array for training sets, filled in width, height, channels, dtype
+X_train = np.zeros((len(os.listdir(IMAGE_PATH)), IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
+Y_train = np.zeros((len(os.listdir(MASK_PATH)), IMAGE_HEIGHT, IMAGE_WIDTH, 1), dtype = np.bool)
 
 
+
+# resize training images and masks
+n = 0
+for file in os.listdir(IMAGE_PATH):
+    img = imread(IMAGE_PATH + file)[:,:,:IMG_CHANNEL]
+    img = resize(img, (IMAGE_HEIGHT, IMAGE_WIDTH), mode = 'constant', preserve_range=True)
+    X_train[n] = img
+    n += 1
+
+m = 0
+for file in os.listdir(MASK_PATH):
+    msk = imread(MASK_PATH + file)[:,:]
+    msk = resize(msk, (IMAGE_HEIGHT, IMAGE_WIDTH,1), mode = 'constant', preserve_range=True)
+    Y_train[n] = msk
+    m += 1
+    
+
+
+    
+# resize test images
+
+
+# Build the model
 inputs = tf.keras.layers.Input((IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
 s = tf.keras.layers.Lambda(lambda x: x/255)(inputs)
 
-#Contraction path
+# Contraction path
 c1 = tf.keras.layers.Conv2D(16, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(s)
 c1 = tf.keras.layers.Dropout(0.1)(c1) # dropout
 c1 = tf.keras.layers.Conv2D(16, (3,3), activation= 'relu', kernel_initializer='he_normal', padding='same')(c1)
@@ -72,3 +120,11 @@ outputs = tf.keras.layers.Conv2D(1, (1,1), activation="sigmoid")(c9)
 model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 model.summary()
+
+###############################################################################
+# Model checkpoint
+
+# define a checkpoint and call back functions
+
+# show the fitting result
+
