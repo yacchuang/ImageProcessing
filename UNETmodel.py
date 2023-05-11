@@ -154,7 +154,7 @@ pred_test_t = (pred_test > 0.5).astype(np.uint8)
 ######################################################################################################
 # Perform a sanity check on some random training samples
 ix = random.randint(0, len(pred_train_t))
-imshow(X_train[ix])
+imshow(X_train[ix, :, :, 0])
 plt.show()
 imshow(np.squeeze(Y_train[ix]))
 plt.show()
@@ -178,5 +178,5 @@ ix = random.randint(0, len(os.listdir(TEST_PATH)))
 pred_test = loaded_model.predict(X_test, verbose=1)
 pred_test_t = (pred_test > 0.5).astype(np.uint8)
 
-imshow(np.squeeze(pred_test_t[ix, :, :, 0]))
+imshow(np.squeeze(pred_test_t[ix]))
 plt.show()
