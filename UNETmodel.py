@@ -129,7 +129,7 @@ outputs = tf.keras.layers.Conv2D(1, (1,1), activation="sigmoid")(c9)
 model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 model.summary()
-model.save("SomaSeg.h5")
+# model.save("SomaSeg.h5")
 
 ###############################################################################
 # Model checkpoint
@@ -138,7 +138,7 @@ checkpoint = tf.keras.callbacks.ModelCheckpoint('SomaSeg.h5', verbose=1, save_be
 callbacks = [tf.keras.callbacks.TensorBoard(log_dir='logs',update_freq='epoch')]
 
 results = model.fit(X_train, Y_train, validation_split=0.1, batch_size = 16, epochs=50, callbacks=callbacks)
-
+model.save("SomaSeg.h5")
 
 # show the fitting result
 idx = random.randint(0, len(X_train))
