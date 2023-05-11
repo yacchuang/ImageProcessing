@@ -26,9 +26,8 @@ IMAGE_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTrai
 MASK_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/masks/"
 TEST_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/test/"
 PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/"
-# read all images IDs use os.walk
-# TRAIN_ID = next(os.walk(TRAIN_PATH))[1]
-# TEST_ID = next(os.walk(TEST_PATH))[1]
+
+
 
 IMAGE_WIDTH = 1280
 IMAGE_HEIGHT = 1280
@@ -69,6 +68,7 @@ plt.imshow(X_train[image_x,:,:,0])
 plt.imshow(np.squeeze(Y_train[image_x]))
 '''
 
+######################################################################################################
 # Build the model
 inputs = tf.keras.layers.Input((IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
 s = tf.keras.layers.Lambda(lambda x: x/255)(inputs)
@@ -131,7 +131,7 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']
 model.summary()
 # model.save("SomaSeg.h5")
 
-###############################################################################
+######################################################################################################
 # Model checkpoint
 
 checkpoint = tf.keras.callbacks.ModelCheckpoint('SomaSeg.h5', verbose=1, save_best_only=True)
@@ -151,6 +151,7 @@ pred_train_t = (pred_train > 0.5).astype(np.uint8)
 pred_val_t = (pred_val > 0.5).astype(np.uint8)
 pred_test_t = (pred_test > 0.5).astype(np.uint8)
 
+######################################################################################################
 # Perform a sanity check on some random training samples
 ix = random.randint(0, len(pred_train_t))
 imshow(X_train[ix])
@@ -167,4 +168,15 @@ plt.show()
 imshow(np.squeeze(Y_train[int(Y_train.shape[0]*0.9):][ix]))
 plt.show()
 imshow(np.squeeze(pred_val_t[ix]))
+plt.show()
+
+######################################################################################################
+# Load model and apply on test images
+loaded_model = tf.keras.saving.load_model("SomaSeg.h5")
+ix = random.randint(0, len(os.listdir(TEST_PATH)))
+
+pred_test = loaded_model.predict(X_test, verbose=1)
+pred_test_t = (pred_test > 0.5).astype(np.uint8)
+
+imshow(np.squeeze(pred_test_t[ix, :, :, 0]))
 plt.show()
