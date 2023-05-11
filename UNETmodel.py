@@ -24,7 +24,8 @@ np.random.seed = seed
 # Define training and testing path
 IMAGE_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/image/"
 MASK_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/masks/"
-
+TEST_PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/test/"
+PATH = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSegTraining/"
 # read all images IDs use os.walk
 # TRAIN_ID = next(os.walk(TRAIN_PATH))[1]
 # TEST_ID = next(os.walk(TEST_PATH))[1]
@@ -36,8 +37,6 @@ IMG_CHANNEL = 3
 # Create an empty array for training sets, filled in width, height, channels, dtype
 X_train = np.zeros((len(os.listdir(IMAGE_PATH)), IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
 Y_train = np.zeros((len(os.listdir(MASK_PATH)), IMAGE_HEIGHT, IMAGE_WIDTH, 1), dtype = np.bool)
-
-
 
 # resize training images and masks
 n = 0
@@ -51,14 +50,24 @@ m = 0
 for file in os.listdir(MASK_PATH):
     msk = imread(MASK_PATH + file)[:,:]
     msk = resize(msk, (IMAGE_HEIGHT, IMAGE_WIDTH,1), mode = 'constant', preserve_range=True)
-    Y_train[n] = msk
+    Y_train[m] = msk
     m += 1
     
 
-
-    
 # resize test images
+X_test = np.zeros((len(os.listdir(TEST_PATH)), IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
+r = 0
+for file in os.listdir(TEST_PATH):
+    tst = imread(TEST_PATH + file)[:,:,:IMG_CHANNEL]
+    tst = resize(tst, (IMAGE_HEIGHT, IMAGE_WIDTH), mode = 'constant', preserve_range=True)
+    X_test[r] = tst
+    r += 1
 
+'''
+image_x = random.randint(0, len(os.listdir(IMAGE_PATH))
+plt.imshow(X_train[image_x,:,:,0])
+plt.imshow(np.squeeze(Y_train[image_x]))
+'''
 
 # Build the model
 inputs = tf.keras.layers.Input((IMAGE_HEIGHT, IMAGE_WIDTH, IMG_CHANNEL))
@@ -120,11 +129,42 @@ outputs = tf.keras.layers.Conv2D(1, (1,1), activation="sigmoid")(c9)
 model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 model.summary()
+model.save("SomaSeg.h5")
 
 ###############################################################################
 # Model checkpoint
 
-# define a checkpoint and call back functions
+checkpoint = tf.keras.callbacks.ModelCheckpoint('SomaSeg.h5', verbose=1, save_best_only=True)
+callbacks = [tf.keras.callbacks.TensorBoard(log_dir='logs',update_freq='epoch')]
+
+results = model.fit(X_train, Y_train, validation_split=0.1, batch_size = 16, epochs=50, callbacks=callbacks)
+
 
 # show the fitting result
+idx = random.randint(0, len(X_train))
 
+pred_train = model.predict(X_train[:int(X_train.shape[0]*0.9)], verbose=1)
+pred_val = model.predict(X_train[int(X_train.shape[0]*0.9):], verbose=1)
+pred_test = model.predict(X_test, verbose=1)
+
+pred_train_t = (pred_train > 0.5).astype(np.uint8)
+pred_val_t = (pred_val > 0.5).astype(np.uint8)
+pred_test_t = (pred_test > 0.5).astype(np.uint8)
+
+# Perform a sanity check on some random training samples
+ix = random.randint(0, len(pred_train_t))
+imshow(X_train[ix])
+plt.show()
+imshow(np.squeeze(Y_train[ix]))
+plt.show()
+imshow(np.squeeze(pred_train_t[ix]))
+plt.show()
+
+# Perform a sanity check on some random validation samples
+ix = random.randint(0, len(pred_val_t))
+imshow(X_train[int(X_train.shape[0]*0.9):][ix])
+plt.show()
+imshow(np.squeeze(Y_train[int(Y_train.shape[0]*0.9):][ix]))
+plt.show()
+imshow(np.squeeze(pred_val_t[ix]))
+plt.show()
