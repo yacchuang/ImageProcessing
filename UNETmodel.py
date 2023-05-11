@@ -172,11 +172,13 @@ plt.show()
 
 ######################################################################################################
 # Load model and apply on test images
-loaded_model = tf.keras.saving.load_model("SomaSeg.h5")
+# loaded_model = tf.keras.saving.load_model("SomaSeg.h5")
 ix = random.randint(0, len(os.listdir(TEST_PATH)))
 
-pred_test = loaded_model.predict(X_test, verbose=1)
+pred_test = model.predict(X_test, verbose=1)
 pred_test_t = (pred_test > 0.5).astype(np.uint8)
 
+imshow(X_test[ix, :, :, 0])
+plt.show()
 imshow(np.squeeze(pred_test_t[ix]))
 plt.show()
