@@ -63,3 +63,15 @@ model.evaluate(x_test_noise, x_test)
 model.save('AutoencodeDenoise.model')
 
 pred_img = model.predict(x_test_noise)
+
+plt.figure(figsize=(40, 4))
+for i in range(10):
+    # display original
+    ax = plt.subplot(3, 20, i + 1)
+    plt.imshow(x_test_noise[i].reshape(28, 28), cmap="binary")
+    
+    # display reconstructed (after noise removed) image
+    ax = plt.subplot(3, 20, 40 +i+ 1)
+    plt.imshow(pred_img[i].reshape(28, 28), cmap="binary")
+
+plt.show()
