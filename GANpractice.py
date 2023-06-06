@@ -56,7 +56,7 @@ def build_generator():
 ### Define descriminator
 # Binary classification - sigmoid activation
 
-def build_descriminator():
+def build_discriminator():
     
     model = Sequential()
     
@@ -154,31 +154,30 @@ def save_imgs(epoch):
 
 optimizer = Adam(0.0002, 0.5)  #Learning rate and momentum.   
     
+# Build and compile the discriminator first. 
+discriminator = build_discriminator()
+discriminator.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+
+# Only generating (faking) images, so no tracking metrics
+generator = build_generator()
+generator.compile(loss='binary_crossentropy', optimizer=optimizer)
+
+#In a GAN the Generator network takes noise z as an input to produce its images. 
+z = Input(shape=(100,))
+img = generator(z)
+
         
-        
-        
+# While training generator, do not update discriminator weights
+discriminator.trainable = False
 
-### Generate fake images
+# validity check in the generated images
+valid = discriminator(img)
 
+# Combine the models, set the loss function and optimizer
+# Only train on generator to fool discriminator: noise as input -> generate images -> determine validity
+combined = Model(z, valid)
+combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
+train(epochs=100, batch_size=32, save_interval=10) #Change epochs back to 30K
 
-
-# Generate fake images using above latent_dim and n_samples as input
-
-
-
-
-
-### Train descriminator and generator
-
-## enumerate through epoches and batches
-# Take real images from datasets
-# calculate loss from real images
-
-# Take fake images from generator model
-# calculate loss from fake images
-
-# Take latent points to generate images
-
-
-
+generator.save('generator_model.h5')
