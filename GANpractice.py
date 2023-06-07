@@ -10,7 +10,7 @@ from keras.layers import BatchNormalization
 from keras.layers import LeakyReLU
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import numpy as np
 
 #Define input image dimensions
@@ -39,6 +39,9 @@ def build_generator():
     model.add(Dense(1024))
     model.add(LeakyReLU(alpha=0.3))
     model.add(BatchNormalization(momentum=0.8))
+    
+    model.add(Dense(np.prod(img_shape), activation='tanh'))
+    model.add(Reshape(img_shape))
     
     model.summary()
     
@@ -112,7 +115,7 @@ def train(epochs, batch_size=128, save_interval=50):
         
         ## Train the generator
         # Generate n_samples latent points as generator input to create fake images
-        noise = np.random.normal(0,1(batch_size, 100))
+        noise = np.random.normal(0,1, (batch_size, 100))
         
         # The generator wants the discriminator to label the generated samples as valid (ones)
         valid_y = np.array([1]*batch_size)
@@ -147,7 +150,7 @@ def save_imgs(epoch):
             axs[i,j].axis('off')
             cnt += 1
             
-    fig.savefig("images/mnist_%d.png" % epoch)
+    fig.savefig("C:/Users/ya-chen.chuang/Documents/Python Scripts/PYpractice/images/mnist_%d.png" % epoch)
     plt.close()
     
 ##############################################################################
