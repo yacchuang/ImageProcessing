@@ -181,6 +181,6 @@ valid = discriminator(img)
 combined = Model(z, valid)
 combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-train(epochs=100, batch_size=32, save_interval=10) #Change epochs back to 30K
+train(epochs=10000, batch_size=32, save_interval=10) #Change epochs back to 30K
 
 generator.save('generator_model.h5')
