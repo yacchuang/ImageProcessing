@@ -10,13 +10,14 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt 
 import os
+from tifffile import imsave
 
 ###############################################################################
 ## Individual file
 ###############################################################################
 
-image_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/BF2ClassCellSeg/images/SP-014037_531426_Hs-APP-E9E10_05.tif"
-mask_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/BF2ClassCellSeg/masks/SP-014037_531426_Hs-APP-E9E10_label05.tif"
+image_path = "R:/YaChen/TrainingImage/image2/C4-Open3-2ndExp_Scan1.qptiff-1.tif"
+mask_path = "R:/YaChen/TrainingImage/image2/HistogramMask/C4-Open3-2ndExp_Scan1.qptiff-1_cluster_seg_mask.tif"
 
 df = pd.DataFrame()
 
@@ -39,7 +40,7 @@ NewImg = []
 
 row = 0
 for index in df_mask: 
-    if index == 76:
+    if index == 255:
         NewImg.append(df_img[row])
     else:
         NewImg.append("0")
@@ -53,7 +54,7 @@ Image = ImageArray.astype(np.uint8)
 NewImg = Image.reshape(img.shape)
 
 plt.imshow(NewImg)
-plt.imsave('NeuN-Img/'+ 'SP-014037_531426_Hs-APP-E9E10_NeuN-_05.jpg', NewImg)
+imsave('C4-Open3-2ndExp_Scan1.qptiff-1_cluster_seg_MaskedImage.tif', NewImg)
 
 
 

@@ -10,16 +10,17 @@ from skimage import io, img_as_ubyte, img_as_float
 from skimage.color import rgb2gray
 import numpy as np
 from matplotlib import pyplot as plt
+from tifffile import imsave
 
-img = img_as_float(io.imread("C:/Users/ya-chen.chuang/Documents/QuPath/SampleImages/HandEcompressed_Scan1.tif"))
+img = img_as_float(io.imread("R:/YaChen/TrainingImage/image1/C4-Open3-2ndExp_Scan1.qptiff-2.tif"))
 
 plt.imshow(img, cmap="gray")
-gray = rgb2gray(img)
+# gray = rgb2gray(img)
 
 
 #Denoising and create a histogram
-sigma_est = np.mean(estimate_sigma(gray, multichannel=True))
-denoise = denoise_nl_means(gray, h=1.15*sigma_est, fast_mode=False, patch_size = 5, patch_distance=3, multichannel= False)
+sigma_est = np.mean(estimate_sigma(img, multichannel=True))
+denoise = denoise_nl_means(img, h=1.15*sigma_est, fast_mode=False, patch_size = 5, patch_distance=3, multichannel= False)
 
 plt.imshow(denoise, cmap="gray")
 
@@ -31,16 +32,18 @@ plt.hist(denoise_img_as_8byte.flat, bins=100, range=(0,255))
 
 
 #Segmentation
-seg1 = (denoise_ubyte <= 100)
-seg2 = (denoise_ubyte > 100) & (denoise_ubyte <= 200)
-seg3 = (denoise_ubyte > 200) & (denoise_ubyte <= 255)
+seg1 = (denoise_ubyte <= 30)
+seg2 = (denoise_ubyte > 30) & (denoise_ubyte <= 80)
+seg3 = (denoise_ubyte > 80) & (denoise_ubyte <= 255)
 
 all_seg = np.zeros((denoise_ubyte.shape[0], denoise_ubyte.shape[1], 3))
 
-all_seg[seg1] = (1,0,0)
-all_seg[seg2] = (0,1,0)
+all_seg[seg1] = (0,0,0)
+all_seg[seg2] = (0,0,0)
 all_seg[seg3] = (0,0,1)
 plt.imshow(all_seg)
+imsave("C4-Open3-2ndExp_Scan1.qptiff-2_all_seg.tif", all_seg)
+
 
 #Cleaned Segmentation
 from scipy import ndimage as nd

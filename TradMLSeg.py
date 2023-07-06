@@ -10,10 +10,10 @@ import pandas as pd
 import cv2
 from matplotlib import pyplot as plt
 
-'''
-img = cv2.imread("C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/BF2ClassCellSeg-1/images/SP-014037_531426_Hs-APP-E9E10_1.tif")
-img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-'''
+
+img = cv2.imread("R:/YaChen/TrainingImage/image2/C4-Open3-2ndExp_Scan1.qptiff-1.tif")
+# img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 
 ########################### Create Features ###################################
 def feature_extraction(img):
