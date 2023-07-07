@@ -57,13 +57,63 @@ model.add(Conv2D(1, (3, 3), activation = 'relu', padding = 'same'))
 model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 model.summary()
 
-model.fit(x_train_noise, x_train, epochs=10, batch_size=64, shuffle=True, validation_data=(x_test_noise, x_test))
+# history = model.fit(x_train_noise, x_train, epochs=10, batch_size=64, shuffle=True, validation_data=(x_test_noise, x_test), callbacks=[tensorboard])
+# model.evaluate(x_test_noise, x_test)
+
+# model.save('AutoencodeDenoise.model')
+
+# pred_img = model.predict(x_test_noise)
+
+###########################################################
+#Tensorboard callback
+
+from tensorflow.keras.callbacks import TensorBoard
+
+file_name = 'AutoencodeDenoise'
+tensorboard = TensorBoard(log_dir="logs\\{}".format(file_name))
+
+
+
+history = model.fit(x_train_noise, x_train, epochs=10, batch_size=64, shuffle=True, validation_data=(x_test_noise, x_test), callbacks=[tensorboard])
 model.evaluate(x_test_noise, x_test)
+# print("Accuracy = ", (acc * 100.0), "%")
 
 model.save('AutoencodeDenoise.model')
 
 pred_img = model.predict(x_test_noise)
 
+
+############################################################################
+## Open Tensorboard
+
+# Open Anaconda Prompt
+
+# activate tf1_model_export
+# python -m tensorboard.main --logdir=logs/
+# launch Tensorboard using the link provided
+############################################################################
+
+#plot the training and validation accuracy and loss at each epoch
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs = range(1, len(loss) + 1)
+plt.plot(epochs, loss, 'y', label='Training loss')
+plt.plot(epochs, val_loss, 'r', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+plt.plot(epochs, acc, 'y', label='Training acc')
+plt.plot(epochs, val_acc, 'r', label='Validation acc')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
 
 
 plt.figure(figsize=(40, 4))
@@ -77,3 +127,13 @@ for i in range(10):
     plt.imshow(pred_img[i].reshape(28, 28), cmap="binary")
 
 plt.show()
+
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(x_test_noise, pred_img)
+
+import seaborn as sns
+sns.heatmap(cm, annot=True)
+
+
