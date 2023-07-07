@@ -21,7 +21,7 @@ import os
 image_dataset = pd.DataFrame()
 
 # read all images in the folder
-image_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSeg/image/"
+image_path = "R:/YaChen/TrainingImage/TradMLSeg/images/"
 for image in os.listdir(image_path):
     print(image)
     df1 = pd.DataFrame()
@@ -118,7 +118,7 @@ for image in os.listdir(image_path):
 ###############################################################################
     
 mask_dataset = pd.DataFrame()
-mask_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/Cy5CellSeg/masks/"
+mask_path = "R:/YaChen/TrainingImage/TradMLSeg/masks/"
 
 for mask in os.listdir(mask_path):
     df2 = pd.DataFrame()
@@ -153,7 +153,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_
 
 from sklearn.svm import LinearSVC
 
-SVMmodel = LinearSVC(max_iter=500)
+SVMmodel = LinearSVC(max_iter=500000)
 SVMmodel.fit(X_train, y_train)
 
 y_pred = SVMmodel.predict(X_test)
@@ -183,8 +183,8 @@ print("Accuracy = ", metrics.accuracy_score(y_test, RF_y_pred))
 
 import pickle
 
-filename = "SomaSeg"
-pickle.dump(SVMmodel, open(filename, 'wb'))
+filename = "FLProbeClusterSeg"
+pickle.dump(RFmodel, open(filename, 'wb'))
 
 Load_model = pickle.load(open(filename, 'rb'))
 result = Load_model.predict(X)
@@ -192,5 +192,5 @@ result = Load_model.predict(X)
 Segment = result.reshape(img.shape)
 
 plt.imshow(Segment)
-plt.imsave('NeunSeg1.jpg', Segment, cmap='jet')
+plt.imsave('FLProbeClusterSeg.jpg', Segment, cmap='jet')
 
