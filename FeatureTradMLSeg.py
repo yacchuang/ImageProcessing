@@ -182,6 +182,8 @@ print("Accuracy = ", metrics.accuracy_score(y_test, RF_y_pred))
 ###############################################################################
 
 import pickle
+from tifffile import imsave
+
 
 filename = "FLProbeClusterSeg"
 pickle.dump(RFmodel, open(filename, 'wb'))
@@ -192,5 +194,5 @@ result = Load_model.predict(X)
 Segment = result.reshape(img.shape)
 
 plt.imshow(Segment)
-plt.imsave('FLProbeClusterSeg.jpg', Segment, cmap='jet')
+imsave('FLProbeClusterSeg.tif', Segment)
 
