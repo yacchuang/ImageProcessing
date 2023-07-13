@@ -11,7 +11,7 @@ import numpy as np
 from tifffile import imsave
 
 
-img = img_as_float(io.imread("R:/YaChen/TrainingImage/image1/C4-Open3-2ndExp_Scan1.qptiff-2.tif"))
+img = img_as_float(io.imread("R:/YaChen/TrainingImage/DotImg/C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_02.tif"))
 
 plt.hist(img.flat, bins=100, range=(0, 1)) 
 
@@ -42,10 +42,12 @@ eq_img = exposure.equalize_adapthist(denoise_img)
 # For markers, let us include all between each peak.
 markers = np.zeros(img.shape, dtype=np.uint)
 
-markers[(eq_img < 0.5) & (eq_img > 0.1)] = 1
-markers[(eq_img > 0.5) & (eq_img < 0.6)] = 2
+markers[(eq_img < 0.7) & (eq_img > 0)] = 1
+markers[(eq_img > 0.7) & (eq_img < 1)] = 2
 
 from skimage.segmentation import random_walker
+from skimage.color import rgb2gray
+
 # Run random walker algorithm
 # https://scikit-image.org/docs/dev/api/skimage.segmentation.html#skimage.segmentation.random_walker
 labels = random_walker(eq_img, markers, beta=10, mode='bf')
@@ -57,8 +59,10 @@ all_segments = np.zeros((eq_img.shape[0], eq_img.shape[1], 3)) #nothing but deno
 all_segments[segm1] = (0,0,0)
 all_segments[segm2] = (1,1,1)
 
-#plt.imshow(all_segments)
-imsave("C4-Open3-2ndExp_Scan1.qptiff-2_RW.tif", all_segments)
+all_segments = rgb2gray(all_segments)
+
+plt.imshow(all_segments)
+imsave("C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_RW_0-7_02.tif", all_segments)
 
 from scipy import ndimage as nd
 
@@ -71,4 +75,4 @@ all_segments_cleaned[segm1_closed] = (0,0,0)
 all_segments_cleaned[segm2_closed] = (1,1,1)
 
 plt.imshow(all_segments_cleaned) 
-imsave("C4-Open3-2ndExp_Scan1.qptiff-2_RW_cleaned.tif", all_segments_cleaned)
+imsave("C4-Open3-2ndExp_Scan1.qptiff-1_RW_0-7_cleaned.tif", all_segments_cleaned)

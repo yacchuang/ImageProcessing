@@ -8,16 +8,19 @@ Created on Tue May  9 08:36:54 2023
 import pandas as pd
 import cv2
 import numpy as np
+from skimage import io, img_as_float
 from matplotlib import pyplot as plt 
 import os
 from tifffile import imsave
+
 
 ###############################################################################
 ## Individual file
 ###############################################################################
 
-image_path = "R:/YaChen/TrainingImage/image2/C4-Open3-2ndExp_Scan1.qptiff-1.tif"
-mask_path = "R:/YaChen/TrainingImage/image2/HistogramMask/C4-Open3-2ndExp_Scan1.qptiff-1_cluster_seg_mask.tif"
+image_path = "R:/YaChen/TrainingImage/DotImg/C2-SP-013908_9501_10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_10.tif"
+mask_path = "R:/YaChen/TrainingImage/DotMask/C2-SP-013908_9501_10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_10.tif_RW_0-7.tif"
+masked_img = "R:/YaChen/TrainingImage/MaskedImg/"
 
 df = pd.DataFrame()
 
@@ -27,8 +30,9 @@ plt.imshow(img)
 img2 = img.reshape(-1)
 df['PixelValue'] = img2
 
-msk = cv2.imread(mask_path)
-msk = cv2.cvtColor(msk, cv2.COLOR_BGR2GRAY)
+# msk = cv2.imread(mask_path)
+msk = img_as_float(io.imread(mask_path))
+# msk = cv2.cvtColor(msk, cv2.COLOR_BGR2GRAY)
 plt.imshow(msk)     
 msk2 = msk.reshape(-1)
 df['MaskValue'] = msk2          
@@ -40,7 +44,7 @@ NewImg = []
 
 row = 0
 for index in df_mask: 
-    if index == 255:
+    if index == 1:
         NewImg.append(df_img[row])
     else:
         NewImg.append("0")
@@ -54,16 +58,17 @@ Image = ImageArray.astype(np.uint8)
 NewImg = Image.reshape(img.shape)
 
 plt.imshow(NewImg)
-imsave('C4-Open3-2ndExp_Scan1.qptiff-1_cluster_seg_MaskedImage.tif', NewImg)
+imsave(masked_img + 'C2-SP-013908_9501_10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_10_RW_0-7_MaskedImage.tif', NewImg)
 
-
+'''
 
 ###############################################################################
 ## loop throught the whole folder
 ###############################################################################
 
-image_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/BF2ClassCellSeg/images/"
-mask_path = "C:/Users/ya-chen.chuang/Documents/QuPath/MLtraining/BF2ClassCellSeg/masks/"
+image_path = "R:/YaChen/TrainingImage/DotImg/"
+mask_path = "R:/YaChen/TrainingImage/DotMask/"
+masked_img = "R:/YaChen/TrainingImage/MaskedImg/"
 
 
 
@@ -77,8 +82,9 @@ for image_file in os.listdir(image_path):
         img2 = img.reshape(-1)
         df['PixelValue'] = img2
     
-        msk = cv2.imread(mask_path + mask_file)
-        msk = cv2.cvtColor(msk, cv2.COLOR_BGR2GRAY)
+        # msk = cv2.imread(mask_path + mask_file)
+        # msk = cv2.cvtColor(msk, cv2.COLOR_BGR2GRAY)
+        msk = img_as_float(io.imread(mask_path + mask_file))
         msk2 = msk.reshape(-1)
         df['MaskValue'] = msk2    
         
@@ -88,7 +94,7 @@ for image_file in os.listdir(image_path):
         
         row = 0
         for index in df_mask: 
-            if index == 29:
+            if index == 1:
                 NewImg.append(df_img[row])
             else:
                 NewImg.append("0")
@@ -100,12 +106,12 @@ for image_file in os.listdir(image_path):
         ImageArray = np.array(df['NewImage'].array)
         Image = ImageArray.astype(np.uint8)
         NewImg = Image.reshape(img.shape)
-        name = image_file.split("SP-")
-        plt.imsave('NeuN+Img/'+ name[-1] +'.jpg', NewImg)
+        # name = image_file.split("SP-")
+        imsave(masked_img + image_file + '_MaskedImg.tif', NewImg)
         
         
         
-    
+'''    
     
 
 '''

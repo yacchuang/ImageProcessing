@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 from tifffile import imsave
 
 
-img = cv.imread('R:/YaChen/TrainingImage/image1/C4-Open3-2ndExp_Scan1.qptiff-2.tif')
+img = cv.imread('R:/YaChen/TrainingImage/DotImg/C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_01.tif')
 # Z = img.reshape((-1,3))
 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 img2 = img.reshape(-1)
@@ -24,7 +24,7 @@ plt.imshow(img)
 
 # define criteria, number of clusters(K) and apply kmeans()
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-K = 3
+K = 2
 ret,label,center=cv.kmeans(img2,K,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
 
 # Now convert back into uint8, and make original image
@@ -49,9 +49,9 @@ df = pd.DataFrame()
 row = 0
 for index in df_mask: 
     if index == 2 or index == 1:
-        NewImg.append("255")
-    else:
         NewImg.append("0")
+    else:
+        NewImg.append("255")
     
     row += 1
 
@@ -61,4 +61,4 @@ ImageArray = np.array(df['NewImage'].array)
 Image = ImageArray.astype(np.uint8)
 NewImg = Image.reshape(img.shape)
 plt.imshow(NewImg)
-imsave("C4-Open3-2ndExp_Scan1.qptiff-2_Kmean_all_seg_mask.tif", NewImg)
+imsave("C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_Kmean_seg_mask_01.tif", NewImg)

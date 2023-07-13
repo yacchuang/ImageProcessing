@@ -11,7 +11,7 @@ import cv2
 from matplotlib import pyplot as plt
 from tifffile import imsave
 
-img = cv2.imread('R:/YaChen/TrainingImage/image2/C4-Open3-2ndExp_Scan1.qptiff-1.tif')
+img = cv2.imread('R:/YaChen/TrainingImage/DotImg/C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_01.tif')
 Z = img.reshape((-1,3))
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 img2 = img.reshape(-1)
@@ -27,7 +27,7 @@ plt.xlabel("n_components")
 
 
 # Pick n_components based on the curve, somewhere around elbow
-GMMmodel = GMM(n_components=3, covariance_type='tied').fit(Z)
+GMMmodel = GMM(n_components=2, covariance_type='tied').fit(Z)
 GMMlabel = GMMmodel.predict(Z)
 
 
@@ -52,7 +52,7 @@ ImageArray = np.array(df['NewImage'].array)
 Image = ImageArray.astype(np.uint8)
 NewImg = Image.reshape(img.shape)
 plt.imshow(NewImg)
-imsave("C4-Open3-2ndExp_Scan1.qptiff-1_GMM_all_seg_mask.tif", NewImg)
+imsave("C2-SP-013908_6001 10_SR-ASO-DMD5-S1_Mfa-PECAM1-C2_Mfa-S100b-C3_Mfa-GAP43-C4_wygr_GMMmask_01.tif", NewImg)
 
 '''
 original_shape = img.shape
